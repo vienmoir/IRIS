@@ -1,5 +1,5 @@
 # IRIS 
-Inflorescence Recognition Intelligence System
+Inflorescence Recognition Intelligent System
 ## What was that for
 The project was made for the Deep Learning class in TU Darmstadt. It is focused on using deep learning for image recognition.
 ## What is it about
