@@ -4,9 +4,10 @@
 import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from loadmodel import LoadModel
+#from loadmodel import LoadModel
 from cropim import CropIm
 from classifyim import Classify
+import numpy as np
 
 import random
 
@@ -24,23 +25,41 @@ def start(bot, update):
 def get_image(bot, update):
     global model, lb
     file_id = update.message.photo[-1].file_id
+    #print("hm")
     photo = bot.getFile(file_id)
+    #print("got it")
     photo.download(file_id+'.png')
+   # print("downloaded")
     img = CropIm(file_id+'.png')
+   # print("cropped")
     os.remove(file_id+'.png')
+    #print("removed")
     update.message.reply_text(random.choice([
         'Recognition in progress',
         "One moment, I'll check what tree is that",
         'Processing...'
         ]))
-    first, second, third = Classify(img, model, lb)
+    prob, first, second, third = Classify(img)
     print("success")
-    if first == "none"
+    if first == "none":
         update.message.reply_text("I'm not sure what is it. Please, try another image1")
     else:
-        result = label.replace("_", " ")
-        result = result.capitalize()
-        update.message.reply_text("This is most probably %s. It might also be %s or %s, though!" % (first, second, third))
+        first = np.array2string(first)
+        first = first.replace("_", " ")
+        first = first.replace("['", "")
+        first = first.replace("']", "")
+        first = first.capitalize()
+        second = np.array2string(second)
+        second = second.replace("_", " ")
+        second = second.replace("['", "")
+        second = second.replace("']", "")
+        second = second.capitalize()
+        third = np.array2string(third)
+        third = third.replace("_", " ")
+        third = third.replace("['", "")
+        third = third.replace("']", "")
+        third = third.capitalize()
+        update.message.reply_text("I am %d%% sure this is %s. It might also be %s or %s, though!" % (prob, first, second, third))
 
 
 def reply_text(bot, update):
@@ -72,6 +91,5 @@ def main():
 
 if __name__ == '__main__':
     print("I'm here")
-    model, lb = LoadModel()
-    print("ok")
+   # model, lb = LoadModel()
     main()
